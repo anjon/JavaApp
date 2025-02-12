@@ -5,5 +5,6 @@ public class App {
         System.out.println("Hello from Java App");
         System.out.println("This is the 2d test");
         System.out.println("This is the 3rd test");
+        System.out.println("This is the 4th test");
     }
 }
