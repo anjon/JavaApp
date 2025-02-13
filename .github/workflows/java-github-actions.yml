@@ -6,7 +6,7 @@ on:
       - main  # Trigger the workflow on pushes to the main branch
 
 env:
-  IMAGE_NAME: my-java-app  # Name of the Docker image
+  IMAGE_NAME: java-app  # Name of the Docker image
   DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}  # Docker Hub username
   DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}  # Docker Hub access token
 
