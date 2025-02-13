@@ -60,6 +60,7 @@ jobs:
         with:
           name: counter
           path: counter.txt
+          retention-days: 5
           if-no-files-found: warn
 
       # Login to Docker Hub
