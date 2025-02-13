@@ -37,7 +37,6 @@ jobs:
         with:
           name: counter
           path: ./
-          if-no-files-found: warn  # Do not fail if the artifact doesn't exist
 
       # Initialize or increment the counter
       - name: Initialize or Increment Counter
