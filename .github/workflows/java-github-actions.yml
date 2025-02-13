@@ -4,12 +4,9 @@ on:
   push:
     branches:
       - main  # Trigger the workflow on pushes to the main branch
-  pull_request:
-    branches:
-      - main  # Trigger the workflow on pull requests to the main branch
 
 env:
-  IMAGE_NAME: java-app  # Name of the Docker image
+  IMAGE_NAME: my-java-app  # Name of the Docker image
   DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}  # Docker Hub username
   DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}  # Docker Hub access token
 
@@ -33,39 +30,43 @@ jobs:
       - name: Build with Maven
         run: mvn clean package
 
+      # Download the counter artifact (if it exists)
+      - name: Download Counter Artifact
+        id: download-counter
+        uses: actions/download-artifact@v3
+        with:
+          name: counter
+          path: ./
+          if-no-files-found: warn  # Do not fail if the artifact doesn't exist
+
+      # Initialize or increment the counter
+      - name: Initialize or Increment Counter
+        id: counter
+        run: |
+          if [ -f counter.txt ]; then
+            COUNTER=$(cat counter.txt)
+            COUNTER=$((COUNTER + 1))
+          else
+            COUNTER=1
+          fi
+          echo "Current counter: $COUNTER"
+          echo "$COUNTER" > counter.txt
+          FORMATTED_TAG=$(printf "v%02d" $COUNTER)
+          echo "FORMATTED_TAG=$FORMATTED_TAG" >> $GITHUB_ENV
+
+      # Upload the updated counter as an artifact
+      - name: Upload Counter Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: counter
+          path: counter.txt
+
       # Login to Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
-
-      # Retrieve the incremental counter
-      - name: Get Incremental Counter
-        id: counter
-        uses: actions/cache@v3
-        with:
-          path: counter.txt
-          key: counter-${{ github.ref }}
-          restore-keys: counter-${{ github.ref }}
-
-      # Increment the counter
-      - name: Increment Counter
-        run: |
-          if [ -f counter.txt ]; then
-            COUNTER=$(cat counter.txt)
-          else
-            COUNTER=0
-          fi
-          COUNTER=$((COUNTER + 1))
-          echo $COUNTER > counter.txt
-          echo "INCREMENTAL_TAG=$COUNTER" >> $GITHUB_ENV
-
-      # Format the tag as v01, v02, etc.
-      - name: Format Tag
-        run: |
-          FORMATTED_TAG=$(printf "v%02d" $INCREMENTAL_TAG)
-          echo "FORMATTED_TAG=$FORMATTED_TAG" >> $GITHUB_ENV
 
       # Build the Docker image
       - name: Build Docker image
