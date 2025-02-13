@@ -37,6 +37,7 @@ jobs:
         with:
           name: counter
           path: ./counter.txt
+          if-no-files-found: warn
 
       # Initialize or increment the counter
       - name: Initialize or Increment Counter
