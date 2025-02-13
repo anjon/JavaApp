@@ -33,6 +33,7 @@ jobs:
       # Download the counter artifact (if it exists)
       - name: Download Counter Artifact
         id: download-counter
+        needs: Upload Counter Artifact
         uses: actions/download-artifact@v4
         with:
           name: counter
